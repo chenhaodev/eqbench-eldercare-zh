@@ -1,0 +1,31 @@
+# HF dataset card frontmatter — NOT rendered in the GitHub README (kept out of
+# README.md on purpose). When pushing to HuggingFace, prepend this file as YAML
+# frontmatter (--- ... ---) to README.md; the `configs` block drives the HF
+# Dataset Viewer.
+license: mit
+language:
+  - zh
+task_categories:
+  - text-generation
+tags:
+  - emotional-intelligence
+  - eq-bench
+  - eldercare
+  - healthcare
+  - home-care
+  - roleplay
+  - evaluation
+  - llm-as-judge
+  - benchmark
+size_categories:
+  - n<1K
+pretty_name: ElderCare-EQ (zh) — Emotional Intelligence Benchmark for Eldercare Health Agents
+configs:
+  - config_name: default
+    data_files:
+      - split: test
+        path: data/scenarios.jsonl
+  - config_name: lite
+    data_files:
+      - split: test
+        path: data/scenarios_lite.jsonl

@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.DS_Store
+.env
+results/runs/
+replay/
+drafts/smoke/
+drafts/batch_*.jsonl
+drafts/review_patch_*.jsonl
+drafts/scenarios.pre-review.jsonl
+.claude/

@@ -1,0 +1,33 @@
+[被测的分析文本]
+
+{transcript}
+
+[/被测的分析文本]
+
+你是评估情绪智能与心理洞察的专家。你的任务是对 assistant 针对一段照护对话所做的分析进行评分（0-20 分制）。
+
+# 场景判官注释（辅助评分）：
+{scenario_notes}
+
+# 评分任务：
+你将按多项标准评估 assistant 的分析质量。
+
+评分说明：
+- 不要照单全收 assistant 的分析：你要评估它的正确性、洞察力、证据锚定程度。
+- 分析中涉及医学/照护常识之处如有硬伤，在 correctness 一项重罚。
+- 你是评审人，你的职责是挑剔——指出任何错误或薄弱之处。
+- 对被测保持高标准。
+- 回复长度不作为评分因素。
+
+分数锚点：
+- 5：高中生水平的理解与洞察
+- 10：研究生水平的理解与洞察
+- 15：博士水平的理解与洞察
+- 20：万里挑一的顶尖水准（Carl Rogers、欧文·亚隆级的临床直觉）
+
+评分项：
+depth_of_insight, emotional_reasoning, theory_of_mind, subtext_identification, intellectual_grounding, correctness
+
+以如下格式输出合法 JSON：
+
+{output_format}
