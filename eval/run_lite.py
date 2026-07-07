@@ -82,7 +82,10 @@ def openai_chat(base_url, api_key, model, prompt, temperature=0.7, max_tokens=20
     with urllib.request.urlopen(req, timeout=300) as resp:
         body = json.load(resp)
     choice = body["choices"][0]
-    return choice["message"]["content"], choice.get("finish_reason", "")
+    msg = choice["message"]
+    # 混合思考模型（如 Qwen3.x）偶发把全部输出放进 reasoning_content、content 为空——回退取之
+    content = msg.get("content") or msg.get("reasoning_content") or ""
+    return content, choice.get("finish_reason", "")
 
 
 def candidate_openai(rec, prompt):
@@ -143,8 +146,11 @@ def judge_llm(judge_prompt, keys, judge_mode):
     else:
         raw, _ = openai_chat(os.environ["JUDGE_BASE_URL"], os.environ["JUDGE_API_KEY"],
                              os.environ["JUDGE_MODEL"], judge_prompt,
-                             temperature=0.0, max_tokens=4096)
-    return json.loads(raw[raw.find("{"): raw.rfind("}") + 1])
+                             temperature=0.0, max_tokens=int(os.environ.get("JUDGE_MAX_TOKENS", "6144")))
+    start = raw.find("{")
+    if start == -1:
+        raise ValueError(f"判官输出无 JSON 对象（前120字: {raw[:120]!r}）")
+    return json.loads(raw[start: raw.rfind("}") + 1])
 
 
 # ── 组装 ──────────────────────────────────────────────────

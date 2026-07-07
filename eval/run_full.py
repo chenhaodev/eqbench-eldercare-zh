@@ -131,8 +131,11 @@ def judge_call(rec, judge_prompt, keys, args):
     else:
         raw, _ = openai_chat(os.environ["JUDGE_BASE_URL"], os.environ["JUDGE_API_KEY"],
                              os.environ["JUDGE_MODEL"], judge_prompt,
-                             temperature=0.0, max_tokens=4096)
-    return json.loads(raw[raw.find("{"): raw.rfind("}") + 1])
+                             temperature=0.0, max_tokens=int(os.environ.get("JUDGE_MAX_TOKENS", "6144")))
+    start = raw.find("{")
+    if start == -1:
+        raise ValueError(f"判官输出无 JSON 对象（前120字: {raw[:120]!r}）")
+    return json.loads(raw[start: raw.rfind("}") + 1])
 
 
 def run_one(rec, args):
