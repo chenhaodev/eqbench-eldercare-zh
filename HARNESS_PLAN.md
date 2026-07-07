@@ -1,6 +1,9 @@
-# ElderCare-EQ 评测 Harness 计划（v0.1 草案）
+# ElderCare-EQ 评测 Harness 计划（v0.2 · 大部分已落地）
 
-> 状态：**待用户确认接入方式后启动**。本计划的设计原则：接入方式未定 → 把它隔离在一个 adapter 文件里，其余全部现在就能定。
+> 状态更新：P0 已交付并超额——多轮 runner `eval/run_full.py`（probe/natural 双模式、
+> dry-run mock、断点续跑、error 剔分母）与单轮 `eval/run_lite.py` 都可直接跑，
+> claude-cli 通道 live 冒烟通过。**剩余待办**：真管家接入（§3 的 B/C adapter，等接入
+> 4 问的答案）、多迭代稳分（P3）、Elo 成对比较。以下原计划保留作设计依据。
 
 ## 1. 目标与范围
 
