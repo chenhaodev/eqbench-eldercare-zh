@@ -1,0 +1,45 @@
+{
+  "eval": "eldercare-eq-full",
+  "mode": "multi-turn probe + rubric",
+  "adapter": "openai",
+  "judge": "deepseek-v4-pro",
+  "n_total": 47,
+  "n_ok": 47,
+  "n_error": 0,
+  "n_truncated": 0,
+  "rubric_score_pct": 49.9,
+  "per_criterion_mean": {
+    "demonstrated_empathy": 9.93,
+    "pragmatic_ei": 7.91,
+    "depth_of_insight": 12.33,
+    "social_dexterity": 8.33,
+    "emotional_reasoning": 11.37,
+    "message_tailoring": 10.02,
+    "health_safety": 7.44,
+    "elder_communication": 10.53,
+    "medical_boundary": 11.91
+  },
+  "analysis_score_pct": 63.7,
+  "per_domain_mean": {
+    "临终话题与重病沟通": 10.44,
+    "保健品谣言与诈骗": 10.58,
+    "健康焦虑与体检恐慌": 9.36,
+    "家庭照护冲突调解": 10.22,
+    "尊严与自主": 11.36,
+    "急症红旗淡化": 9.11,
+    "独居孤独与丧偶哀伤": 7.49,
+    "用药依从与慢病管理": 10.07,
+    "认知衰退早期迹象": 11.36
+  },
+  "red_flag_scenarios": {
+    "n": 31,
+    "health_safety_distribution": {
+      "min": 0,
+      "median": 4,
+      "max": 16
+    }
+  },
+  "verdict": null,
+  "caveat": "口径=Full 多轮 probe，分数与 Lite 单轮版及另一 mode 均不可比；判官为 LLM 主观评估，换判官型号不可横比。数据=data/scenarios.jsonl n=47；error 已剔出分母。",
+  "command": "eval/run_full.py --live --adapter openai --judge openai --mode probe --tag qwen3-8b-full-probe-v1"
+}

@@ -73,14 +73,32 @@ def candidate_claude_cli(rec, prompt):
     return r.stdout.strip()
 
 
+def openai_request(base_url, api_key, payload, retries=3):
+    """带重试的 OpenAI 兼容请求（瞬时网络故障如代理 SSL 掉线、429/5xx 指数退避重试）。"""
+    import time
+    last = None
+    for attempt in range(retries):
+        try:
+            req = urllib.request.Request(
+                base_url.rstrip("/") + "/chat/completions",
+                data=json.dumps(payload).encode(),
+                headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"})
+            with urllib.request.urlopen(req, timeout=300) as resp:
+                return json.load(resp)
+        except urllib.error.HTTPError as e:
+            last = e
+            if e.code not in (429, 500, 502, 503, 504):
+                raise
+        except (urllib.error.URLError, TimeoutError, ConnectionError, OSError) as e:
+            last = e
+        time.sleep(3 * (attempt + 1))
+    raise RuntimeError(f"重试 {retries} 次后仍失败: {last}")
+
+
 def openai_chat(base_url, api_key, model, prompt, temperature=0.7, max_tokens=2048):
-    req = urllib.request.Request(
-        base_url.rstrip("/") + "/chat/completions",
-        data=json.dumps({"model": model, "temperature": temperature, "max_tokens": max_tokens,
-                         "messages": [{"role": "user", "content": prompt}]}).encode(),
-        headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"})
-    with urllib.request.urlopen(req, timeout=300) as resp:
-        body = json.load(resp)
+    body = openai_request(base_url, api_key,
+                          {"model": model, "temperature": temperature, "max_tokens": max_tokens,
+                           "messages": [{"role": "user", "content": prompt}]})
     choice = body["choices"][0]
     msg = choice["message"]
     # 混合思考模型（如 Qwen3.x）偶发把全部输出放进 reasoning_content、content 为空——回退取之
@@ -281,9 +299,17 @@ def main():
     results_file = run_dir / "results.jsonl"
     done = set()
     if results_file.exists():
+        # error 行不算完成：剔除后重写文件，重跑时自动补测（瞬时网络失败可自愈）
+        kept = []
         for line in results_file.read_text(encoding="utf-8").splitlines():
-            if line.strip():
-                done.add(json.loads(line)["id"])
+            if not line.strip():
+                continue
+            r = json.loads(line)
+            if r["status"] == "error":
+                continue
+            kept.append(line)
+            done.add(r["id"])
+        results_file.write_text("\n".join(kept) + ("\n" if kept else ""), encoding="utf-8")
 
     with results_file.open("a", encoding="utf-8") as fh:
         for rec in recs:

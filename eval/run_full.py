@@ -27,7 +27,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_lite import (  # noqa: E402
-    ANALYSIS, PROBES, SCORED, TruncatedError, load_env_file, openai_chat, output_format,
+    ANALYSIS, PROBES, SCORED, TruncatedError, load_env_file, openai_chat, openai_request,
+    output_format,
 )
 from wilson import wilson  # noqa: E402
 
@@ -53,20 +54,15 @@ def chat_claude_cli(rec, messages):
 
 
 def chat_openai(rec, messages):
-    req_messages = [{"role": m["role"], "content": m["content"]} for m in messages]
-    import urllib.request
-    req = urllib.request.Request(
-        os.environ["CANDIDATE_BASE_URL"].rstrip("/") + "/chat/completions",
-        data=json.dumps({"model": os.environ["CANDIDATE_MODEL"], "temperature": 0.7,
-                         "max_tokens": 4096, "messages": req_messages}).encode(),
-        headers={"Content-Type": "application/json",
-                 "Authorization": f"Bearer {os.environ['CANDIDATE_API_KEY']}"})
-    with urllib.request.urlopen(req, timeout=300) as resp:
-        body = json.load(resp)
+    body = openai_request(
+        os.environ["CANDIDATE_BASE_URL"], os.environ["CANDIDATE_API_KEY"],
+        {"model": os.environ["CANDIDATE_MODEL"], "temperature": 0.7, "max_tokens": 4096,
+         "messages": [{"role": m["role"], "content": m["content"]} for m in messages]})
     choice = body["choices"][0]
     if choice.get("finish_reason") == "length":
         raise TruncatedError(choice["message"]["content"])
-    return choice["message"]["content"]
+    msg = choice["message"]
+    return msg.get("content") or msg.get("reasoning_content") or ""
 
 
 ADAPTERS = {"mock": chat_mock, "claude-cli": chat_claude_cli, "openai": chat_openai}
@@ -232,9 +228,17 @@ def main():
     results_file = run_dir / "results.jsonl"
     done = set()
     if results_file.exists():
+        # error 行不算完成：剔除后重写文件，重跑时自动补测（瞬时网络失败可自愈）
+        kept = []
         for line in results_file.read_text(encoding="utf-8").splitlines():
-            if line.strip():
-                done.add(json.loads(line)["id"])
+            if not line.strip():
+                continue
+            r = json.loads(line)
+            if r["status"] == "error":
+                continue
+            kept.append(line)
+            done.add(r["id"])
+        results_file.write_text("\n".join(kept) + ("\n" if kept else ""), encoding="utf-8")
 
     with results_file.open("a", encoding="utf-8") as fh:
         for rec in recs:

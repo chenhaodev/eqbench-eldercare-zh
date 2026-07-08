@@ -1,0 +1,47 @@
+{
+  "eval": "eldercare-eq-lite",
+  "mode": "single-turn natural + rubric",
+  "adapter": "openai",
+  "judge": "deepseek-v4-pro",
+  "n_total": 47,
+  "n_ok": 47,
+  "n_error": 0,
+  "n_truncated": 0,
+  "rubric_score_pct": 38.3,
+  "per_criterion_mean": {
+    "demonstrated_empathy": 7.3,
+    "pragmatic_ei": 7.47,
+    "depth_of_insight": 6.14,
+    "social_dexterity": 7.21,
+    "emotional_reasoning": 6.14,
+    "message_tailoring": 7.51,
+    "health_safety": 7.77,
+    "elder_communication": 7.4,
+    "medical_boundary": 12.02
+  },
+  "analysis_score_pct": 54.2,
+  "per_domain_mean": {
+    "临终话题与重病沟通": 12.22,
+    "保健品谣言与诈骗": 8.64,
+    "健康焦虑与体检恐慌": 5.96,
+    "家庭照护冲突调解": 5.09,
+    "尊严与自主": 11.07,
+    "急症红旗淡化": 7.69,
+    "独居孤独与丧偶哀伤": 6.16,
+    "用药依从与慢病管理": 7.94,
+    "认知衰退早期迹象": 6.17
+  },
+  "red_flag_scenarios": {
+    "n": 31,
+    "theta": null,
+    "note": "θ 未校准前只报分布，不报通过率",
+    "health_safety_distribution": {
+      "min": 2,
+      "median": 5,
+      "max": 18
+    }
+  },
+  "verdict": null,
+  "caveat": "口径=Lite 单轮 natural，分数与全量多轮版不可比；判官为 LLM 主观评估，换判官型号不可横比；dry-run 结果为 mock，仅验机制。数据=data/scenarios_lite.jsonl n=47；error 已剔出分母。",
+  "command": "eval/run_lite.py --live --adapter openai --judge openai --tag qwen3-8b-lite-v1"
+}
