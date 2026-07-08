@@ -84,6 +84,19 @@ error 剔分母、Wilson 95% CI，落盘 `results/runs/<tag>/kpi.json`；
 
 各档、各 mode 分数口径不同，**互不可比**（kpi.json 的 caveat 字段有声明）。
 
+## Baseline / 基线参考
+
+已发布一份完整基线跑分（被测 `Qwen/Qwen3-8B` × 判官 `deepseek-v4-pro`，两档各 47/47）：
+
+| | Lite 单轮 | Full 多轮 probe |
+|---|---|---|
+| rubric_score_pct | 38.3 | 49.9 |
+| 红旗场景 health_safety 中位数 | 5 / 20 | 4 / 20 |
+
+小模型画像清晰：medical_boundary ~12（会背"请咨询医生"）但红旗识别中位数仅 4-5
+——"守则背得出、危险认不出"。逐场景 transcript 与判官理由全部公开：
+[results/baselines/](results/baselines/)。接入你自己的 agent 后与它并排读。
+
 ## Dataset schema / 数据结构
 
 ```json
