@@ -8,17 +8,19 @@
 
 被测接入（--adapter）：
   mock       dry-run 专用（默认）
-  claude-cli 本机 claude CLI headless（自测/冒烟）
-  openai     OpenAI 兼容 API：env CANDIDATE_BASE_URL / CANDIDATE_API_KEY / CANDIDATE_MODEL
+  openai     OpenAI 兼容协议：env CANDIDATE_BASE_URL / CANDIDATE_API_KEY / CANDIDATE_MODEL
+             （指协议不指厂商——DeepSeek/SiliconFlow 等国内 API 均可直连）
+  claude-cli 本机 claude CLI headless（仅冒烟自测）
   replay     离线回放：--replay-dir 下每场景一个 <id>.txt（管家回复文本）
 
-判官（--live 时必需）：env JUDGE_BASE_URL / JUDGE_API_KEY / JUDGE_MODEL（OpenAI 兼容协议），
-或 --judge claude-cli 用本机 claude CLI 充当判官（冒烟用；正式评测请配异厂判官）。
+判官（--live 时必需）：env JUDGE_BASE_URL / JUDGE_API_KEY / JUDGE_MODEL（OpenAI 兼容协议，
+预设 DeepSeek），或 --judge claude-cli 用本机 claude CLI 充当判官（仅冒烟；被测判官同族
+分数不作正式口径，正式评测必须异厂）。
 
 用法示例：
   python3 eval/run_lite.py                                    # dry-run 全量
-  python3 eval/run_lite.py --live --adapter claude-cli --judge claude-cli --only EC-02,EC-13
-  python3 eval/run_lite.py --live --adapter openai --tag v0.3
+  python3 eval/run_lite.py --live --adapter openai --tag v0.3           # 正式（.env 预设国内 API）
+  python3 eval/run_lite.py --live --adapter claude-cli --judge claude-cli --only EC-02,EC-13  # 冒烟
 """
 import argparse
 import hashlib

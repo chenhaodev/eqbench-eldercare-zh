@@ -9,13 +9,15 @@
            debrief 复盘轮；判官用 rubric_probe_zh。诊断信号最大。
   natural  罐头消息原样发送；判官用 rubric_natural_zh。最贴生产行为。
 
-被测接入（--adapter）：mock（dry-run 默认）/ claude-cli / openai。
+被测接入（--adapter）：mock（dry-run 默认）/ openai / claude-cli。
+openai 指 OpenAI 兼容协议（DeepSeek/SiliconFlow 等国内 API 均可直连，非 OpenAI 厂商）；
+claude-cli 仅冒烟自测（被测判官同族，分数不作正式口径）。
 多轮状态：openai 走全量 messages 数组（无状态多轮）；claude-cli 拼接文本上下文。
 
 用法：
   python3 eval/run_full.py                                          # dry-run 全量
-  python3 eval/run_full.py --live --adapter claude-cli --judge claude-cli --only EC-02
-  python3 eval/run_full.py --live --adapter openai --mode probe --tag v1-full
+  python3 eval/run_full.py --live --adapter openai --mode probe --tag v1-full   # 正式（.env 预设国内 API）
+  python3 eval/run_full.py --live --adapter claude-cli --judge claude-cli --only EC-02  # 冒烟自测
 """
 import argparse
 import hashlib
